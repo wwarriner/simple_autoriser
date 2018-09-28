@@ -4,7 +4,7 @@ The purpose of this code is to serve as a demonstration of how metalcasting feed
 # Usage
 The entirety of the code is encapsulated in a single function, together with an example script of how to use it, and a sample stereolithography (STL) geometry file. Run the script `determine_feeders_example.m` to see the function in action. Feel free to explore, examine, modify, and build on the code. If you do, please let us know! If you have any questions, comments, concerns, suggestions, or bug reports, don't hesitate to contact us!
 
-The external libraries and MATLAB toolboxes listed below are required. The code was written in `R2018a`, and is not guaranteed to work for previous versions. The libraries are included with the code, and have their own licenses.
+The external libraries and MATLAB toolboxes listed below are required. The code was written in `R2018a`, and is not guaranteed to work for previous versions. The libraries are included with the code, and have their own licenses. Ensure all subfolders of the repository root folder are on the MATLAB path.
 
 #### External Libraries
 - [3D Euclidean Distance Transform for Variable Data Aspect Ratio](https://www.mathworks.com/matlabcentral/fileexchange/15455-3d-euclidean-distance-transform-for-variable-data-aspect-ratio) (bwdistsc, BSD)
