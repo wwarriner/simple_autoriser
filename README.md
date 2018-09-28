@@ -11,6 +11,8 @@ The external libraries and MATLAB toolboxes listed below are required. The code 
 - [Mesh voxelization](https://www.mathworks.com/matlabcentral/fileexchange/27390-mesh-voxelisation) (Mesh_voxelization, BSD)
 - [Matlab Capped Cylinder](https://github.com/wwarriner/matlab_capped_cylinder)
 - [Generate maximally perceptually-distinct colors](https://www.mathworks.com/matlabcentral/fileexchange/29702-generate-maximally-perceptually-distinct-colors)
+- [stlwrite - write ASCII or Binary STL files](https://www.mathworks.com/matlabcentral/fileexchange/20922-stlwrite-write-ascii-or-binary-stl-files) (stlwrite, BSD)
+- [vtkwrite : Exports various 2D/3D data to ParaView in VTK file format](https://www.mathworks.com/matlabcentral/fileexchange/47814-vtkwrite-exports-various-2d-3d-data-to-paraview-in-vtk-file-format) (vtkwrite, MIT)
 
 #### MATLAB Toolboxes
 - [Image Processing Toolbox](https://www.mathworks.com/products/image.html)
