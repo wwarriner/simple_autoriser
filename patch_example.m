@@ -1,7 +1,10 @@
 function patch_example( stl, feeders )
 %% SETUP
 lightgray = [ 0.9 0.9 0.9 ];
-colors = generate_palette( feeders.count, jet );
+avoided_colors = [ 0 0 0; lightgray; 1 1 1 ];
+ph = patch( stl, 'facecolor', lightgray, 'edgealpha', 0.2 );
+ph.FaceColor = lightgray; ph.EdgeAlpha = 0.2;
+colors = distinguishable_colors( feeders.count, avoided_colors );
 fh = figure( 'color', 'w' );
 axh = axes( fh );
 
