@@ -1,7 +1,16 @@
 %% determine_feeders by William Warriner, 2018 %%
-function [ feeders, stl, mesh ] = determine_feeders( file, element_count )
+%function [ feeders, stl, mesh ] = determine_feeders( file, element_count )
+%% SETUP
+lightgray = [ 0.9 0.9 0.9 ];
+avoided_colors = [ 0 0 0; lightgray; 1 1 1 ];
+colors = distinguishable_colors( feeders.count, avoided_colors );
+fh = figure( 'color', 'w', 'position', [ 10 10 800 700 ] );
 %% GEOMETRY IMPORT
 [ stl.faces, stl.vertices ] = CONVERT_meshformat( READ_stl( file ) );
+geo_ax = subplot( 2, 2, 1 );
+patch( stl, 'facecolor', lightgray, 'edgealpha', 0 );
+axis( geo_ax, 'square', 'equal', 'vis3d', 'off' ); hold( geo_ax, 'on' );
+camlight( 'right' );
 %% VOXELIZATION
 mesh.origin = min( stl.vertices );
 mesh.lengths = max( stl.vertices ) - mesh.origin;
@@ -20,11 +29,31 @@ normalized_edt = feeders.edt ./ max_edt;
 TOLERANCE = 1e-4;
 height = ( 1 + TOLERANCE ) / max_edt;
 filtered_edt = max_edt .* imhmax( normalized_edt, height );
+edt_ax = subplot( 2, 2, 2 );
+np = permute( normalized_edt, [ 2 1 3 ] );
+level = 0.5;
+plot_iso( stl, np, level, mesh.scale, mesh.origin, 2, 2, 2, lightgray );
+b = uicontrol('Parent',fh,'Style','slider','Position',[450,350,300,23],...
+              'value', level, 'min',0, 'max',1);
+bgcolor = fh.Color;
+bl3 = uicontrol('Parent',fh,'Style','text','Position',[550,320,100,23],...
+                'String','EDT Level','BackgroundColor',bgcolor);
+b.Callback = @(es,ed)plot_iso( stl, np, es.Value, mesh.scale, mesh.origin, 2, 2, 2, lightgray );
+% stuff here
 %% WATERSHED SEGMENTATION
 filtered_edt( ~mesh.interior ) = -inf;
 feeders.segments = watershed( -filtered_edt );
 feeders.segments( ~mesh.interior ) = 0;
 feeders.count = max( feeders.segments( : ) );
+ws_ax = subplot( 2, 2, 3 );
+p = permute( feeders.segments, [ 2 1 3 ] );
+for i = 1 : feeders.count
+    fv = isosurface( p == i, 0.5 );
+    fv.vertices = fv.vertices * mesh.scale + mesh.origin;
+    patch( fv, 'facecolor', colors( i, : ), 'edgealpha', 0 );
+end
+axis( ws_ax, 'square', 'equal', 'vis3d', 'off' ); hold( ws_ax, 'on' );
+camlight( 'right' );
 %% DETERMINE SEGMENT INFORMATION
 largest_edt = zeros( feeders.count, 1 );
 largest_edt_index = zeros( feeders.count, 1 );
@@ -64,3 +93,18 @@ for i = 1 : feeders.count
     fv.vertices = fv.vertices + feeders.position( i, : );
     feeders.fvs{ i } = fv;
 end
+feed_ax = subplot( 2, 2, 4 );
+patch( stl, 'facecolor', lightgray, 'edgealpha', 0 );
+for i = 1 : feeders.count    
+    ph = patch( feeders.fvs{ i }, 'facecolor', colors( i, : ), 'edgealpha', 0 );
+end
+axis( feed_ax, 'square', 'equal', 'vis3d', 'off' ); hold( feed_ax, 'on' );
+camlight( 'right' );
+
+geo_ax.CameraViewAngleMode = 'manual';
+Link = linkprop( [ geo_ax, edt_ax, ws_ax, feed_ax ], ...
+   { 'CameraUpVector', 'CameraPosition', 'CameraTarget', 'CameraViewAngle', 'CameraViewAngleMode' } );
+setappdata( fh, 'camera_link', Link );
+view( 3 );
+camzoom( 0.8 );
+zoom( geo_ax, 'off' );
