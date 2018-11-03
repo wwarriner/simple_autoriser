@@ -1,37 +1,30 @@
-function patch_handles = plot_iso( stl, volume_data, levels, scale, origin, m, n, p, color )
+function plot_iso( volume_data, level, mesh, overlay_fv, axh )
 
-if nargin < 6
-    color = [ 0.9 0.9 0.9 ];
-end
-if nargin < 5
-    origin = [ 0 0 0 ];
-end
-if nargin < 4
-    scale = 1;
-end
-if nargin < 3 || isempty( levels )
-    if islogical( volume_data )
-        levels = 1;
-    else
-        levels = unique( volume_data );
-    end
-end
-
-count = length( levels );
-patch_handles = cell( count, 1 );
-axh = subplot( m, n, p );
-cla( axh );
-patch( stl, 'facecolor', color, 'edgealpha', 0, 'facealpha', 0.2 );
-for i = 1 : count
-    
-    fv = isosurface( volume_data > levels( i ), 0.5 );
-    fv.vertices = fv.vertices * scale + origin;
-    patch_handles{ i } = patch( axh, fv, 'facecolor', color, 'edgealpha', 0 );
-    
-end
+anh = annotation( ...
+    'textbox', [ 0.7 0.75 0 0 ], ...
+    'string', 'Updating...', ...
+    'linestyle', 'none', ...
+    'backgroundcolor', [ 1 1 1 ], ...
+    'fitboxtotext', 'on' );
+drawnow();
+cp = axh.CameraPosition;
+ct = axh.CameraTarget;
+cv = axh.CameraViewAngle;
+cu = axh.CameraUpVector;
+cla( axh, 'reset' );
+LIGHT_GRAY = [ 0.9 0.9 0.9 ];
+ORANGE = [ 1 0.65 0 ];    
+fv = isosurface( volume_data > level, 0.5 );
+fv.vertices = fv.vertices * mesh.scale + mesh.origin;
+patch( axh, fv, 'facecolor', ORANGE, 'edgealpha', 0 );
+patch( axh, overlay_fv, 'facecolor', LIGHT_GRAY, 'edgealpha', 0, 'facealpha', 0.2 );
 axis( axh, 'square', 'equal', 'vis3d', 'off' ); hold( axh, 'on' );
+axh.CameraPosition = cp;
+axh.CameraTarget = ct;
+axh.CameraViewAngle = cv;
+axh.CameraUpVector = cu;
 camlight( axh, 'right' );
-fprintf('%.2f\n',levels);
+delete( anh );
+drawnow();
 
 end
-
