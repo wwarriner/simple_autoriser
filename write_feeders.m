@@ -26,4 +26,3 @@ outfile = fullfile( path, sprintf( '%s_feeders.csv', base_name ) );
 writetable( feeder_table, outfile );
 
 end
-
