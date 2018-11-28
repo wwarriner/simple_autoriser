@@ -1,7 +1,4 @@
 function [ feeders, stl, mesh, fh ] = determine_feeders( file, element_count )
-%% SETUP
-LIGHT_GRAY = [ 0.9 0.9 0.9 ];
-fh = figure( 'color', 'w', 'position', [ 10 10 800 700 ], 'resize', 'off' );
 %% GEOMETRY IMPORT
 [ stl.faces, stl.vertices ] = CONVERT_meshformat( READ_stl( file ) );
 %% VOXELIZATION
@@ -12,9 +9,6 @@ shape = ceil( mesh.lengths / mesh.scale );
 mesh.interior = VOXELISE( shape( 1 ), shape( 2 ), shape( 3 ), stl );
 mesh.interior = padarray( mesh.interior, [ 1 1 1 ], 'both' );
 mesh.shape = size( mesh.interior );
-%% GEOMETRY VISUALIZATION
-geo_ax = subplot( 2, 2, 1 );
-plot_patch( geo_ax, [], stl, LIGHT_GRAY );
 %% DISTANCE FIELD BASED SOLIDIFICATION ORDER FIELD
 mesh.surface = mesh.interior & ...
     ~imerode( mesh.interior, conndef( 3, 'minimal' ) );
@@ -25,16 +19,6 @@ normalized_edt = feeders.edt ./ max_edt;
 TOLERANCE = 1e-4;
 height = ( 1 + TOLERANCE ) / max_edt;
 filtered_edt = max_edt .* imhmax( normalized_edt, height );
-%% DISTANCE FIELD VISUALIZATION
-edt_ax = subplot( 2, 2, 2 );
-np = permute( normalized_edt, [ 2 1 3 ] );
-DEFAULT_LEVEL = 0.5;
-view( 3 ); camzoom( 0.8 );
-plot_iso( np, DEFAULT_LEVEL, mesh, stl, edt_ax );
-b = uicontrol( 'Parent', fh, 'Style', 'slider', ...
-    'Position', [440,670,300,23], ...
-    'value', DEFAULT_LEVEL, 'min', 0, 'max', 1 );
-b.Callback = @( slider, ~ ) plot_iso( np, slider.Value, mesh, stl, edt_ax );
 %% WATERSHED SEGMENTATION
 filtered_edt( ~mesh.interior ) = -inf;
 feeders.segments = watershed( -filtered_edt );
@@ -67,16 +51,6 @@ for i = 1 : feeders.count
     T = largest_edt( i );
     shape_factors( i ) = ( L + W ) / T;
 end
-%% WATERSHED VISUALIZATION
-ws_ax = subplot( 2, 2, 3 );
-p = permute( feeders.segments, [ 2 1 3 ] );
-iso_fvs = cell( feeders.count, 1 );
-for i = 1 : feeders.count
-    fv = isosurface( p == i, 0.5 );
-    fv.vertices = fv.vertices * mesh.scale + mesh.origin;
-    iso_fvs{ i } = fv;
-end
-plot_patch( ws_ax, iso_fvs );
 %% GENERATE FEEDER GEOMETRIES
 [ edt_x, edt_y, edt_z ] = ind2sub( mesh.shape, largest_edt_index );
 feeders.position = ( mesh.scale .* [ edt_x edt_y edt_z ] ) + mesh.origin;
@@ -90,10 +64,36 @@ for i = 1 : feeders.count
     feeders.fvs{ i } = fv;
 end
 write_feeders( feeders, file );
-%% FEEDER VISUALIZATION
+%% VISUALIZATION
+LIGHT_GRAY = [ 0.9 0.9 0.9 ];
+fh = figure( 'color', 'w', 'position', [ 10 10 800 700 ], 'resize', 'off' );
+%% GEOMETRY QUADRANT
+geo_ax = subplot( 2, 2, 1 );
+plot_patch( geo_ax, [], stl, LIGHT_GRAY );
+%% DISTANCE FIELD QUADRANT
+edt_ax = subplot( 2, 2, 2 );
+np = permute( normalized_edt, [ 2 1 3 ] );
+DEFAULT_LEVEL = 0.5;
+view( 3 ); camzoom( 0.8 );
+plot_iso( np, DEFAULT_LEVEL, mesh, stl, edt_ax );
+b = uicontrol( 'Parent', fh, 'Style', 'slider', ...
+    'Position', [440,670,300,23], ...
+    'value', DEFAULT_LEVEL, 'min', 0, 'max', 1 );
+b.Callback = @(slider,~)plot_iso( np, slider.Value, mesh, stl, edt_ax );
+%% WATERSHED SEGMENTS QUADRANT
+ws_ax = subplot( 2, 2, 3 );
+p = permute( feeders.segments, [ 2 1 3 ] );
+iso_fvs = cell( feeders.count, 1 );
+for i = 1 : feeders.count
+    fv = isosurface( p == i, 0.5 );
+    fv.vertices = fv.vertices * mesh.scale + mesh.origin;
+    iso_fvs{ i } = fv;
+end
+plot_patch( ws_ax, iso_fvs );
+%% FEEDERS QUADRANT
 feed_ax = subplot( 2, 2, 4 );
 plot_patch( feed_ax, feeders.fvs, stl, LIGHT_GRAY );
+%% LINK CAMERAS
 link = linkprop( [ geo_ax edt_ax ws_ax feed_ax ], ...
     { 'CameraUpVector' 'CameraPosition' 'CameraTarget' 'CameraViewAngle' } );
 setappdata( fh, 'camera_link', link );
-end

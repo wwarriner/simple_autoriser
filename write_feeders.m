@@ -1,7 +1,6 @@
 function write_feeders( feeders, input_file )
 %% FILE MANAGEMENT
 [ path, base_name, ~ ] = fileparts( input_file );
-
 %% TABLE SETUP
 variable_names = { ...
     'number', ...
@@ -20,9 +19,6 @@ feeder_table = table( ...
     feeders.volume, ...
     'variablenames', variable_names ...
     );
-
 %% WRITE
 outfile = fullfile( path, sprintf( '%s_feeders.csv', base_name ) );
 writetable( feeder_table, outfile );
-
-end
