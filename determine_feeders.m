@@ -17,7 +17,7 @@ feeders.edt = mesh.scale .* bwdistsc( mesh.surface | ~mesh.interior );
 max_edt = max( feeders.edt( : ) );
 normalized_edt = feeders.edt ./ max_edt;
 TOLERANCE = 1e-4;
-height = ( 1 + TOLERANCE ) / max_edt;
+height = ( mesh.scale * ( 1 + TOLERANCE ) ) / max_edt;
 filtered_edt = max_edt .* imhmax( normalized_edt, height );
 %% WATERSHED SEGMENTATION
 filtered_edt( ~mesh.interior ) = -inf;
