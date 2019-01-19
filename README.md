@@ -14,6 +14,11 @@ The external libraries and MATLAB toolboxes listed below are required. The code 
 - [stlwrite - write ASCII or Binary STL files](https://www.mathworks.com/matlabcentral/fileexchange/20922-stlwrite-write-ascii-or-binary-stl-files) (stlwrite, BSD)
 - [vtkwrite : Exports various 2D/3D data to ParaView in VTK file format](https://www.mathworks.com/matlabcentral/fileexchange/47814-vtkwrite-exports-various-2d-3d-data-to-paraview-in-vtk-file-format) (vtkwrite, MIT)
 
+#### Geometries
+- [casting by catia](https://grabcad.com/library/casting-by-catia-1) by user RiBKa aTIKA @ [grabcad.com](https://grabcad.com/)
+- [Steering Column Mount](https://grabcad.com/library/steering-column-mount-1) by user Christian Mele @ [grabcad.com](https://grabcad.com/)
+- bearing block, implementation of drawing by William Warriner, original drawing in _Directional Solidification of Steel Castings_ by R. Wlodawer
+
 #### MATLAB Toolboxes
 - [Image Processing Toolbox](https://www.mathworks.com/products/image.html)
 
